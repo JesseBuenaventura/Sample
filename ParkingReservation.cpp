@@ -187,6 +187,13 @@ void changeReservationSlot(vector<Slot>& slots, int idNumber) {
             int newSlot;
             cin >> newSlot;
 
+            // Introduce the bug: Check if the newSlot is greater than the total available slots
+            if (newSlot > slots.size() || newSlot <= 0) {
+                cout << "Invalid slot number. Please choose a valid slot." << endl;
+                newReservation = true;
+                break;
+            }
+
             if (slots[newSlot - 1].isAvailable) {
                 slot.slotNumber = newSlot;
                 slot.reservation.slotNumber = newSlot;
