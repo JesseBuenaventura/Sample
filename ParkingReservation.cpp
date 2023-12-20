@@ -26,27 +26,24 @@ struct Slot {
 /**
  * Function for the user to login into the program
 */
-bool login(int& idNumber, const string& password){
-    int idNum;
-    string pass;
-    bool loggedIn = false;
-
-    while (!loggedIn){
+bool login(int &idNumber, const string &password) {
+    while (true) {
         cout << "Enter your ID Number: ";
-        cin >> idNum;
+        int inputIdNumber;
+        cin >> inputIdNumber;
 
         cout << "Enter your password: ";
-        cin >> pass;
+        string inputPassword;
+        cin >> inputPassword;
 
-        if(idNum == idNumber && pass == password) {
-            idNumber = idNum;
-            cout << "You've Successfully Logged in!" << endl;
-            loggedIn = true;
+        if (inputIdNumber == idNumber && inputPassword == password) {
+            idNumber = inputIdNumber;
+            cout << "You have successfully logged in!" << endl;
+            return true;
         } else {
             cout << "Invalid ID Number or password. Please try again!" << endl;
         }
     }
-    return true;
 }
 
 /**
@@ -160,6 +157,55 @@ void reserveSlot(vector<Slot>& slots, int idNumber) {
     }
 }
 
+void changeReservationSlot(vector<Slot>& slots, int idNumber) {
+    bool checkReservations = false;
+    bool newReservation = false;
+
+    for (const Slot& slot : slots) {
+        if (!slot.isAvailable && slot.reservation.idNumber == idNumber) {
+            checkReservations = true;
+            break;
+        }
+    }
+
+    if (!checkReservations) {
+        cout << "You did not reserve a slot yet!" << endl;
+        return;
+    }
+
+    cout << "Enter the slot you have currently reserved: ";
+    int currentSlot;
+    cin >> currentSlot;
+
+    for (Slot& slot : slots) {
+        if (!slot.isAvailable && slot.reservation.idNumber == idNumber && slot.slotNumber == currentSlot) {
+            slot.isAvailable = true;
+
+            cout << "Enter the new slot number: ";
+            int newSlot;
+            cin >> newSlot;
+
+            if (slots[newSlot - 1].isAvailable) {
+                slot.slotNumber = newSlot;
+                slot.reservation.slotNumber = newSlot;
+                slot.isAvailable = false;
+
+                cout << "Your reservation is moved to Slot " << newSlot << " successfully." << endl;
+                newReservation = true;
+                break;
+            } else {
+                cout << "Slot " << newSlot << " is already occupied. Please choose another slot." << endl;
+                newReservation = true;
+                break;
+            }
+        }
+    }
+
+    if (!newReservation) {
+        cout << "No reservation found for Slot " << currentSlot << ". Unable to change slot." << endl;
+    }
+}
+
 /**
  * Function to display the reservation details of the user
 */
@@ -223,7 +269,8 @@ int main(){
         cout << "1. View Available Slots" << endl;
         cout << "2. View my Reservation" << endl;
         cout << "3. Cancel Reservation" << endl;
-        cout << "4. Logout" << endl;
+        cout << "4. Change Reservation Slot" << endl;
+        cout << "5. Logout" << endl;
         cout << "Enter your choice: ";
         cin >> choice;
 
@@ -270,6 +317,10 @@ int main(){
             }
             break;
         case 4:
+            cout << "Change Reservation Slot" << endl;
+            changeReservationSlot(slots, idNumber);
+            break;
+        case 5:
             cout << "Logging Out" << endl;
             loggedIn = false;
             break;
